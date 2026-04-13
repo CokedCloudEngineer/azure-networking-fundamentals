@@ -1,7 +1,7 @@
 # azure-networking-fundamentals
 
 **Part of my AZ-104 preparation portfolio**
-**Back to main profile -> [CokedCloudEngineer](github.com/CokedCloudEngineer)**
+**Back to main profile -> [CokedCloudEngineer](https://github.com/CokedCloudEngineer)**
 
 > This repository documents my hands-on Azure networking labs
 > as I prepare for the Microsoft Azure Administrator (AZ-104) certification.
