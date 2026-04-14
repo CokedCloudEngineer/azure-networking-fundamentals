@@ -1,1 +1,104 @@
 
+## The Three Things You Need to Know First
+
+Before anything else, these three concepts are the foundation of everything else in this guide.
+
+An IP address is the ID card your device or object has. It is how it gets recognized and how it communicates with everything else.
+
+A subnet mask is the room in which your object and other objects reside in. It defines the boundary of who belongs to the same space as you.
+
+A default gateway is the door that allows traffic from your room to go to and from the outside world. It needs to have an ID card that belongs in the same room as your objects because your objects need to be able to reach the door first before they can send anything out. If the door had a foreign ID card your objects would not even recognize it as their door. And the gateway does not just connect to the internet specifically, it is the door to anywhere outside your room, whether that is another room in the same building or the internet itself.
+
+---
+
+## What Does an IP Address Actually Look Like
+
+Now if you take an object in your subnet room and you look at the ID plastered onto it you will see four numbers, for example 192.168.10.1. What do those weird numbers mean? Its simple, those four numbers are also a set of numbers with an assigned value like if your ID card said wooden chair it would also say what kind of wood it is, date acquired, condition and price. But for our IP address they are octets so its groups of 8 bits per number you see on an IP address. To make it stick better lets take the 192, in its octet form it is 11000000. Now why is that? Its because each 1 represents a different value, always in this order: 128, 64, 32, 16, 8, 4, 2, 1. So every number in the four part arrangement you see in an IP address is just a combination of those bits adding up. So when you see 255.255.255.0 in a subnet mask, which is your room, its the highest a single octet can go because 11111111 means all bits are switched on.
+
+Now your ID card actually has two parts printed on it. The room number, which tells you which room you belong to, and the seat number, which is your specific spot inside that room. The subnet mask is the key that tells you where one ends and the other begins. The 1s are saying this part is the room number and the 0s are saying this part is the seat number. So for 192.168.10.1 with a mask of 255.255.255.0, the 192.168.10 is the room number and the 1 is your seat number. That is why a /24 room can only hold 254 seats. The last octet gives you 256 combinations but seat 0 is the rooms own nameplate, it identifies the room itself and not any device inside it, and seat 255 is the megaphone that everyone in the room hears at once which is the broadcast address. So those two are taken, leaving 254 for actual devices. The rule is always 2 to the power of however many host bits you have, minus 2.
+
+---
+
+## Loopback Address
+
+The loopback address is a way you can use to ping yourself and to check if your IP configuration for your device is correct. In a way its like making sure that your ID card is actually working and is able to talk to other objects that have an ID card. You do that with the ping command like so:
+
+```
+ping 127.0.0.1
+```
+
+That address, 127.0.0.1, is always your own device. It never leaves your machine. Think of it purely as a self-check before you bother trying to talk to anyone else.
+
+---
+
+## Reserved Addresses
+
+A reserved address is a special kind of IP address. They are ID cards that only work within your own specific room. Now how is that valuable? Its valuable because of the fact that important objects in your room need to have an ID card that does not change. This is achieved through DHCP reservations, which we will cover shortly, where the butler is told by you that this specific ID card is going to stay with this specific object no matter what.
+
+---
+
+## Virtual IP (VIP)
+
+A VIP is a different kind of IP address and therefore a different kind of ID card. This kind of ID card acts more like a club badge. Rooms that are occupied by the same members who use that VIP ID card are registered as belonging to the same kind of club.
+
+Now how would that be useful?
+
+It is useful for security reasons. If a robber was targeting a specific room number he would find it easily. But if all of them shared the same club assignment instead he would be even more confused about which room to actually go after.
+
+It also helps with network flexibility. This club badge would make sure the room that hosts it could be a different room if the original room was under maintenance or for some other reason.
+
+That is also why it is highly available. If said room got burned down the club badge could just get transferred to another room entirely.
+
+And it is important for load balancing. You have this club that has an assortment of rooms and they all need to receive the minutes of the club meeting evenly. Now the bearer of the club badge has separate magic powers like a load balancer that allows them to transmit all the paperwork evenly towards all of the club rooms. But here is the important thing to remember: the VIP is just the front door, it is just an address. The load balancer is the actual engine behind it doing the distribution. The VIP can help with distributing the paperwork but it is not necessarily the one with the magic powers.
+
+---
+
+## The Private IP Problem and NAT
+
+Now we have been talking a bunch of stuff about our IP addresses or ID cards. But in the whole world there is a really big problem. We have way more objects than we have ID cards. So how do we work around that constraint? We use private IP address ranges within a network.
+
+These ranges are very big. One class of those ID cards reaches a little over 16 million addresses and the fewest is around the tens of thousands. These ranges are private, and in fact your IP address right now is probably also part of a private range.
+
+So how is it that if you use a private ID card you are still able to use the internet? The answer is NAT, or Network Address Translation. It allows you to use your private IP address or ID card and turn it into an ID card that is public and therefore can access the internet. Think of it like the room having a single public-facing mailbox at the building entrance. Everyone inside the room has their own private ID card but when mail needs to go out to the world it all goes through that one mailbox with the building's public address on it. When replies come back the mailbox knows which room object to deliver it to. Nobody outside the building ever sees your private ID card, just the mailbox address.
+
+The basic design standard that defines these private IP address ranges is called RFC 1918. Here is a quick look at the three ranges it defines:
+
+**10.0.0.0/8**
+- Range: 10.0.0.0 to 10.255.255.255
+- Number of addresses: 16,777,216
+- Class: Single Class A
+- Subnet mask: 255.0.0.0
+- Host ID size: 24 bits, meaning three quarters of the address is assigned to hosts
+
+**172.16.0.0/12**
+- Range: 172.16.0.0 to 172.31.255.255
+- Number of addresses: roughly 1 million
+
+**192.168.0.0/16**
+- Range: 192.168.0.0 to 192.168.255.255
+- Number of addresses: roughly 65,000
+- This is the one your home network is most likely running right now
+
+---
+
+## DHCP
+
+Now you can go on and stick all of the ID cards yourself onto every object in your room and that is okay, but it takes time. And would you really want to be bothered with that unless you have a really good reason? Hell no. That is where a robot butler comes in to do it for you.
+
+This butler is interesting though. He sees an object walk in without an ID card asking if there is a butler or someone around to give it one. The butler comes up and offers one, the object says thanks and agrees to use it, and the butler says acknowledged and marks it as done. The real term for this process is DORA: Discover, Offer, Request, and Acknowledge.
+
+Now remember the butler is leasing the ID card, not giving it permanently. If an object is no longer using the ID card the butler gave it, the butler will take it back and give it to another object that needs it more. That is why for reserved IPs the butler is told by you ahead of time that this specific ID card is going to stay with this specific object no matter what.
+
+For everything else, DHCP gives your object three things when it hands out the welcome package: your IP address which is the seat number, your subnet mask which is the room definition, and your default gateway which is the door out of the room to the rest of the building.
+
+---
+
+## APIPA
+
+But DHCP has a cousin who is very shy and only pops up if her butler cousin cannot come. We call her APIPA, or Automatic Private IP Addressing. This shy maid does most of what her butler cousin can do but because she is so shy the ID cards and welcome package she gives out can only work within the room she is assigned to and only between the objects inside that same room. She also carries a limited rack of ID cards she can hand out, ranging from 169.254.1.0 through 169.254.254.255, with the first and last of the wider range being reserved just like any subnet.
+
+What makes her even more unique is that she is self-sufficient. She does not need a list from you. She just picks a card off her rack on her own and checks if anyone else in the room is already using it before handing it over. No butler, no instructions, she just figures it out herself.
+
+The important thing to remember is that her ID cards cannot get you out of the room. There is no gateway, no door to the rest of the building, no internet. So on the AZ-104, if you ever see a device with a 169.254.x.x address treat it as a red flag. It means the butler never showed up and something went wrong with DHCP.
+
+---
