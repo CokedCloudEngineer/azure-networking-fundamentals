@@ -75,4 +75,4 @@ Class E(Reserved) Leading bits: 1111(240-255)
 
 Class D ones are assigned to multicast communication and what is that? where its a network transmission method where a single data stream is sent by one or multiple senders to multiple specific senders as well. It's like if the landlord of your said building wanted to tell a lot of people but not everyone something important about their rooms so on one day he goes and puts letters under the doorsteps of you rooms and on other days he asks a bunch of people to do it for him 
 
-Class E ones are the stuff we already discussed in the ipv4 addressing readme but to give you guys a refresher these are the ones who are reserved by the dhcp robot butler so you can have the same id card everytime you whip up your object within your room
+Class E ones are reserved by IANA the guys who make all of this ip addressing wizardry possible but for their own researching purposes and are never made public at all
