@@ -1,0 +1,78 @@
+Now we've discussed a fair amount of the IPv4 addressing but now we're going to focus on subnetting. However, to be able to do the necessary math (which I also hate) we have to figure out how our IP addresses or ID cards are made, although I gave a small overview of what it could possibly mean in the first thought process readme I made. Now back to our metaphor of a room, with objects (devices), a door (gateway), the room itself (subnet) and the ID card (IP address). If you were to lets say take an object and take its ID card you would see something along the lines of this:
+192.168.1.1
+Now as you know thats how our IP address looks like for this example generally. But as I said, we need to have a bit of a primer so we can have a way easier time to understand how these ID cards are made. Now that is called Binary Math.
+Binary Math:
+Imagine that you are in a factory where these ID cards are made. And the only way you can make an ID card so you can give it to an object is to use standard factory controls. The only factory control thing you have is an on and off switch. 1 and 0 respectively, thats how binary works because each switch only represents those two states. Now, for one of the four numbers in an IP address or your ID card, it's made by flipping on and off a series of 8 switches. Each switch is called a bit and a series of switches is called a byte, we just have a nickname for it because the word byte is used a lot more aside from networking. It's called an octet because its a bundle of eight.
+Now our objective so we can understand binary math is to visualize it with an example here. This chart is going to be very useful for you whenever you try to determine your subnetting later:
+128  64  32  16  8  4  2  1
+0    0   0   0   0  0  0  0
+The zeros as you can see represent an "off" state for the factory switch.
+1  1  1  1  1  1  1  1
+Now all the switches are in an "on" state. If you look at the numbers on top of those switches I mentioned, you will see 8 sets of numbers as well and the logic here is if its 1 then its "on" and if its on, its corresponding number is added to the final decimal number you might see when you take a look at the IP address. I've already said it before but its always useful to remember that the number 255 is basically the factory switches all turned on. And from 0 to 255 you can mix and match any switch to get any number you like.
+I've explained how this chart works so the specific reason why its useful in subnetting is you can convert your decimal number, which is the number you can see on your ID card, to binary and vice versa. This concept will come up in execution more often the more we tackle the different styles of subnetting later like classful, the magic number and the really important one in my opinion for the AZ-104 which is the 7 second subnetting. The faster you can do this the more time you'll save. But to get things started I'm going to show you how we can convert our example IP address into binary:
+192.168.1.1
+So now we have our ID card, we need to go to the factory console itself and look at the switches:
+0  0  0  0  0  0  0  0
+Well now it seems someone decided to reset everything but not to worry! We have our chart and our chart is going to save us this time. But first we have to convert this empty array of switches into something that looks a lot like our ID card but in the form of switches:
+00000000.00000000.00000000.00000000
+Now the next step is to compare the first number on our ID card to the empty array of switches:
+192
+0  0  0  0  0  0  0  0
+Our goal is to make sure we flip the right switches so it gives out the same number on our ID card. But how are we going to do that? Now for someone like you who I am assuming is just as bad at math as I am, we're going to keep asking ourselves if the switches that are already turned on are equal to or less than the ID card number and we always start with the left side:
+1  0  0  0  0  0  0  0
+For this number the total decimal value is 128, so is 128 equal to or less than 192? Yes, so we move onto the next switch to the right:
+1  1  0  0  0  0  0  0
+Now we have two switches turned on, so if we add the value of those two switches turned on we get 192. Is 192 equal to or less than 192? The answer is its equal so for the remaining switches we just leave them turned off. But on some cases like 168 here:
+1  0  0  0  0  0  0  0
+If we were to add the first and second switch it would be 192. So is 192 equal to or less than 168? No, so we move on to the next switch until we get the number we want, skipping the switches that give us too much:
+1  0  1  0  1  0  0  0
+So if we were to apply that to the whole ID card, the final array of switches should look like this:
+11000000.10101000.00000001.00000001
+If we made an ID card using these switch settings we would have the exact same number as the original ID card.
+Now I will give you a new situation. Although we have a spare ID card, we still need one more for our objects at the room we have to be in later. Luckily a worker who immediately went to lunch and is supposed to take a new ID card is gone so we can steal it, but we still need to know what kind of ID card we're getting. And the switches are already flipped:
+11101001.11011101.00000000.00101000
+For this one things are way easier, we just need to put our conversion chart like so:
+128  64  32  16  8  4  2  1
+And line up the numbers respectively, then add the values to the side:
+1    1   1   0   1  0  0  1  =  233
+1    1   0   1   1  1  0  1  =  221
+0    0   0   0   0  0  0  0  =  0
+0    0   1   0   1  0  0  0  =  40
+Now the final ID card we're going to steal is going to look like this:
+233.221.0.40
+And there you have it, you basically just got primered for the way more intensive subnetting section later. Study this from time to time so you won't forget the logic until it sticks. Oh and everything we just talked about also applies when we deal with room IDs (subnet masks), which will be very useful later.
+
+
+
+Now we got that out of the way we will now tackle the allegedly scary monster that is subnetting. For this one overaching topic im going to divide it into four sequential sections:
+
+Classful
+Classless
+Magic Number
+Seven Second
+
+Now all four of these mind you have their own respective uses for someone like you or me who is about to start losing their sanity to this. The key difference is at least we know how to lose our said sanity. But why would we even need to do this? why would anyone in their right mind, not only read the primer and internalize the binary math concept but also question reality as they deal with what class of ip address how to subnet and etc? the real answer is because subnetting fulfills a few key purposes. The concept of subnetting itself is to make sure that a network which means our building where our rooms are held is divided and managed into tiny subnetworks(subnets) or rooms to improve performance, security and how efficient we dish out ip addresses or the id cards for our objects. With that being said lets start with the Classful Subnetting.
+
+Classful Subnetting
+
+Although this method of subnetting is now favored by other more relevant forms of subnetting. This is still relevant whenever you hear people talk about what kind of address they are interacting with. This was also a method of describing an ip address as its related to its subnet mask. You can imagine if two people are talking about the objects in their room and theyre talking about certain id cards being class A, it means those default subnet masks(rooms) have 8 bits for the network but 24 for the host. A class B is split evenly with 16 for the network and 16 for the host and last but not least for the class C addresses they have 24 for the network but only 8 for the host.
+
+so it looks like this:
+
+Class A: 255.0.0.0 (network.host.host.host)
+Class B: 255.255.0.0 (network.network.host.host)
+Class C: 255.255.255.0 (network.network.network.host) 
+
+But yeah this hasn't been used since 1993 for subnet masking purposes, although for learning the basics or in casual conversation you will still hear these terms. And for the critical function being that its used as a starting point when subnetting our networks. its like youre the engineer for the said building we're talking about we all have to start provisioning the room space so this is one way to start the plan drawing process. 
+
+Now you know what kind of default subnet masks are there how is it related onto our id cards or ip addresses? well, a neat way for you to recognize what kind of class an id card belongs to is to look at its first set of bits, so here's a chart to help you out:
+
+Class A Leading bits:0xxx(0-127)
+Class B Leading bits:10xx(128-191)
+Class C Leading bits:110x(192-223)
+Class D(Multicast) Leading bits: 1110(224-239)
+Class E(Reserved) Leading bits: 1111(240-255)
+
+Class D ones are assigned to multicast communication and what is that? where its a network transmission method where a single data stream is sent by one or multiple senders to multiple specific senders as well. It's like if the landlord of your said building wanted to tell a lot of people but not everyone something important about their rooms so on one day he goes and puts letters under the doorsteps of you rooms and on other days he asks a bunch of people to do it for him 
+
+Class E ones are the stuff we already discussed in the ipv4 addressing readme but to give you guys a refresher these are the ones who are reserved by the dhcp robot butler so you can have the same id card everytime you whip up your object within your room
