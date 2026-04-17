@@ -9,7 +9,7 @@
 > build it, break it, fix it, document why.
 
 ## Topics Covered
-- [ ] 01 - IP Addressing and Subnetting
+- [x] 01 - IP Addressing and Subnetting
 - [ ] 02 - VNets and Subnets
 - [ ] 03 - Network Security Groups (NSGs)
 - [ ] 04 - VNet Peering
