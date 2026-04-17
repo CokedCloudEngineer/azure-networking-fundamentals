@@ -1,0 +1,45 @@
+# Ipv4-Addressing-and-Subnetting
+
+## What This Is
+Addressing and Subnetting is the first small step on this big journey.
+It is important in a sense that, without this key foundational knowledge your exam learning will be
+way more difficult especailly if we start discussing Azure-related services that involves subnetting.
+Subnetting is the skill and art of allocating the right amount of network resources for what you need.
+Addressing helps you understand why ip addresses are that way, certain kinds of ip addresses and protocols.
+
+## What I Built
+I made a full-fledged guide on those aforementioned topics, to promote full
+understanding of subnetting. It's extremely beginner-friendly and uses the Feynman
+approach to the fullest while also considering flow and efficiency.
+
+## Why I Made These Choices
+I considered this approach of studying because i wanted to maximize my retention
+and this study method was better at retaining information and helping concepts
+be driven into a deeper mental level. Also i have consideratons that maybe one day this would be
+of help to other beginners like me.
+
+## What Broke
+Admittedly it took quite the amount of tries to get the concepts and methods to subnet,
+sometimes the formula didn't work or my estimations of the block interval was wrong.
+
+## How I Diagnosed It
+I tried looking at it at a different angle, so i considered ways on
+how i can see the answer faster like writing interval charts only when necessary
+at the length a little over the ip address on the octet in the seven second subnetting
+method.
+
+## What I Consulted
+I consulted Professor Messer's ipv4 addressing videos and subnetting videos.
+As for Azure related content? I consulted John Savill's Azure Masterclass v3.
+Specifically on the vNet Basics section
+
+## What I Understand Now
+I have a deeper appreciation on a glimpse of how intricate networking is. And 
+I do agree that subnetting filters out people from learning more about networking
+but now I'm able to fully understand those two methods, the mystery behind it is gone and
+it's replaced by a daily consistency to practice until it's second nature. 
+
+## Open Questions
+How will i be able to link multiple serivces simultaneously?
+Will i be able to properly secure and configure an orchestration of resources?
+How am i going to troubleshoot future errors i will face?
