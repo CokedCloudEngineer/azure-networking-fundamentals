@@ -27,3 +27,55 @@ Efficiency, as for this benefit. It goes back to how you will use azure software
 Compliance, this one is the least interesting of the three i can think of so far. Although you do need to understand why certain rules are in place for a reason, like for example in the nuclear research industry, they always have strict compliance measures for limiting radiation exposure by time, distance and shielding. As the saying goes, regulations are written in someone else's blood. Some industries and devices need to be properly segmented because they're critical infrastructure or life saving machines. Those devices need to have their own stable, secure and properly isolated bubble to keep our society running.
 
 And all three? Is important for you to bear in mind whenever we progress on our journey, because its not a job to be a cloud engineer. It's a hard earned privilege and responsibility especially if youre working in critical infrastructure.  
+
+Azure Relevant Information section
+
+Now I think its part of a funny joke that the main course material im referencing right now comes from the April fools video he made for 2025. But nevertheless the content found in the video i think is the exact video i need to convey the information. It comes from the stuff i already mentioned within the subnets section earlier. But with a lot subtle burger jokes. Nothing much has changed actually so you can just go back to that section.
+
+Microsoft Learn Section
+
+For this section specifically, we're going to focus on the main learn sandbox stuff for the az 104. Although i might have a separate readme that overviews what i did for this entire section i think here gives me a bit more oomph to go over what i did on the Microsoft learn stuff. Admittedly there might be a lot of hand holding but whats important is that you recognize whats going on and if you dont you always ask and then try again. 
+
+So, the lab activity we're going to try out for today is from the 'Configure virtual networks' module on the AZ-104. The structure will be based on sub-sections i will lay out here so from here on out it'll be my synthesis of the entire module to make it well, understandable for both of us so far. 
+
+Introduction
+
+Remember our metaphors the one where we consider our network a building? The things that we are going to talk about involves virtual networks so similar to vlans they are networks but theyre like that in a logical sense, its mostly software defined stuff but admittedly they can and do have real connectivity but within private networks so if you connect your stuff to azure it's with a vpn or ExpressRoute(if your company is loaded). VNets are mainly for securing communications with their resources there, also scalability and availability. Scalability means that if you need more of a said resource you can expand current capacity or acquire more instances of that resource to accommodate your needs. Availability means even if hell freezes over, your services and operations are still running no matter what. 
+
+Plan Virtual Networks
+
+Earlier i mentioned things about network segmentation and why does the concept exist in the first place. Those principles perfectly apply to how we want to plan our networks here. Planning makes sure you don't over or under allocate addresses within your virtual network. It totally depends on your use cases whether you're just planning a small scale project or a huge cloud server. You can either create a dedicated private cloud-only virtual network(fancy way of saying you can literally prop up a cloud server), securely extend your data center with virtual networks(so if you want to connect your on premises stuff to the cloud you can do it but for the sole reason to extend capacity) or enable hybrid cloud scenarios(just the same as the second point but your intent is to facilitate certain stuff on prem and then in the cloud). So to tie back to our metaphors, this is how Azure, a construction company wants to give you the opportunity to have your own personal building somewhere far away, they're in charge of everything except whats the layout of the building and the rooms sectioned off and the objects within those rooms and how is the floor plan structured. 
+
+Create Subnets
+
+I've already talked about the stuff you would mostly need in the previous sections however i do want to add a few key considerations. You should consider service requirements. Every resource has their own network requirements in the building created by Azure and the types of data coming and going from these services. A service like an azure firewall, will definitely need their own dedicated subnet so they can function properly. Consider your network virtual appliances, as we go over more advanced stuff within this guide we have to consider that Azure naturally routes network traffic between all subnets in a network. That's a huge no no when it comes to security, but we can override the settings wherever it applies accordingly. Consider also your network security groups because they act as your firewalls, allowing or not allowing certain ip ranges and whatnot. 
+
+Create Virtual Networks
+
+These are pretty straightforward and so easy yet dry i dont even know what to commentate on so here you go:
+
+When you create a virtual network, you need to define the IP address space for the network.
+
+Plan to use an IP address space that's not already in use in your organization.
+
+The address space for the virtual network can be either on-premises or in the cloud, but not both.
+
+To create a virtual network, you need to define at least one subnet.
+
+Each subnet contains a range of IP addresses that fall within the virtual network address space.
+
+The address range for each subnet must be unique within the address space for the virtual network.
+
+The range for one subnet can't overlap with other subnet IP address ranges in the same virtual network.
+
+You can create a virtual network in the Azure portal. Provide the Azure subscription, resource group, virtual network name, and service region for the network.
+
+The last thing i can tell you is that your subnetting will help you in this section, specifically if you're a visual thinker like me the switches analogy will go a long way, and power of twos as well because when you're working on the portal directly a lot of information is provided like how much available ips per subnet respectively
+
+
+Plan IP addressing
+
+Now all you need to know about these are very simple:
+
+We're going to use our id card idea for this example. You want to place a private id card(ip address) onto your objects(services/devices) if it means managing your stuff within your virtual network, however if you have public-facing services like hosting a website you should get a public ipv4 address(its cheap anyway). Usually you can just use dynamic addressing to solve most of your problems but for the sake of you getting your experience in and making sure you have a bit of muscle memory i recommend going manual at least for now, especially when we're making our networks with nsgs where they will always just base on the ip ranges you dish out. Also for my own personal context as of the time of this writing, its important in a sense where i would need dns services or if my budget allows a personal domain i can keep up for cheap where i can host the webapp we have. 
+
