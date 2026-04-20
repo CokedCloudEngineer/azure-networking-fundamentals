@@ -1,0 +1,27 @@
+# VNets and Subnets
+
+## What This Is
+It's about how virtual networks work in azure, subnetting them and how to do it in the portal.
+
+## What I Built
+I made a virtual network in azure called samNet for sample net. It's ipv4 with a network set to 10.0.0.0/16. I made three subnets within this network. The first is snet-frontend with a starting address of 10.0.1.0/24. The second is snet-backend with a starting address of 10.0.2.0/24 and the last is snet-db with a starting address of 10.0.3.0/24.
+
+## Why I Made These Choices
+I made these choices as part of my lab activity within a study guide i have. But also it showed me a bit how to logically separate my networks.
+
+## What Broke
+I had struggles with how to deploy the network because whenever i tried to download the template it would prompt a bug and it would error or maybe its part of azure's logic, also i had a few errors with configuring the starting address and the cidr block size
+
+## How I Diagnosed It
+I google to see what was going on, but ultimately useless, i was about to give up when i decided to reconfigure the whole thing from scratch and make another deployment attempt but this time, i chose not to get a template when creating and to also change the region which used to be in the US but its now in Japan.
+
+## What I Consulted
+I consulted Microsoft Learn, John Savill and then Professor Messer for the foundational concepts
+
+## What I Understand Now
+I understand now how to deploy virtual networks in azure, i used to think they're very hard however at least for now everything can be done within the portal. So a foundational aspect in dealing with the platforming process of the resources i will need to deploy. 
+
+## Open Questions
+How will i try to do hub and spoke stuff? 
+How will i be able to make resources talk to each other through said hub?
+how will i be able to use the public ipv4 so that i can connect my raspberry pi and deploy the model there for my capstone?
