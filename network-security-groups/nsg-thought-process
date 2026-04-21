@@ -1,0 +1,35 @@
+Access Control Lists (ACL)
+
+Now, for our third topic we are going to tackle what NSGs are but for the sake of having a better understanding of what they are in Azure we have to consult upon a few topics beforehand, first of which is this ACL thing that i will explain below...
+
+An access control list is for our building think of the list of people and the objects they carry to go in and out. But specifically its a packet filter, and a way to let traffic in or keep it out. This can be used alongside NAT where you should be able to figure out what kind of id card(ip address) needs to be changed from private to public so that it can communicate to the outside world, its how your azure services well at least the front facing ones, the ones where it has to talk to the internet, its private ip is translated to the public one it has to use and the ACL has to have that private ip so it knows that said ip is part of the ips that need to be translated. 
+
+These things are typically applied on a router to watch at traffic going and coming, while some ACLs can be very specific, like just looking at either the source ip, destination ip and etc. Back to our analogy, every allowable list in your building has different rule provisions depending how your list was written. hoever its not that so simple that oh since its part of our list its supposed to go through, it doesn't work that way. what happens is that it will consider to either let a qualified id card through or not which depends on its rules.
+
+A rule base in a firewall? that can be considered an access control list because it has a list of certain ips allowed to qualify for rule comparison or just outright denied at all. This combination of rules is called a tuple, now for efficient and secure traffic flow, some people would combine multiple tuples to make a very specific access control rule. 
+
+How does these rules work though? It starts from top to bottom if the stuff it gets doesn't match the one at the top, it moves down and down until it's either found a match or no match so thats where implicit deny comes in. Since it didn't follow any rule at all why would we let this object be considered to be let into our building, we're not going to allow this id card. These rules can be very general or specific but usually the more specific ones go at the top. 
+
+Firewall Types
+
+Now i was thinking whether or not to fully include all the nitty gritty details on this but i decided not to, however i will still mention the types of firewalls, what they do and where do they work. At the very least this alongside the previous and next section will provide you a more appreciative understanding of the stuff we will do when it comes to network security groups
+
+But generally, if you're connected to the internet( which is most likely since you're reading this from GitHub) you are most definitely using a firewall. A firewall in the most bare bones of the definition is something that controls the flow of network traffic. It can also be used to monitor and control incoming and outgoing corporate data for security and compliance reasons. It's also used to secure the user from accessing sus or otherwise not allowed content or sites and of course last but not the least it is used to protect against malware, attacks and viruses.
+
+Network-based firewalls
+
+these are the traditional ones, think of it as the old guard in the building where we're at, old but generally somewhat reliable in some cases, these kinds of firewalls will look at the UDP port number and a port is like the endpoint of a software or a service like a service endpoint in azure where you'll be connecting various of these to make sure your services can talk to each other.
+
+Oh I forgot to mention they can also integrate other services like VPN so your security environment will be even more tightly locked down. They can also work as a network device of sorts and they're placed at the edge of the network so they control the flow of data within the network and its outward vicinity. it's like properly placing checkpoints near the entry points of your building so ne'er do wells have a harder time getting in and causing damage. 
+
+UTM / AIO security appliance
+
+All you need to know is within it's name, its literally an all in one for protecting your network like inspecting malware, preventing spam, url filter so you can make sure no one's accessing sites they're not supposed to see and a bunch if other functions. Given their multifunctionality they can work at a variety of layers, however you can't run all at the same time because it would severely limit the performance
+
+Next Generation firewalls
+
+These ones are interesting because instead of comparing the port number it looks at all the data in every packet. What does that mean? it can recognize whos sending the traffic, where its being sent, whats in the application layer and with all of that it can then make forwarding decisions depending on those. Next gen is basically able to scan all of this traffic, figure out what kind of application is being used and then and then make said decisions. It's also common for a next gen firewall to have a sort of list of known vulnerabilities, that it can allow or block inside the firewall. The cool part is that its content filtering measures would allow you to not just rely on the urls to block websites but on what kind of websites they might ought to be. 
+
+Web application firewall
+
+Now this is not like a normal firewall. It looks at the input being slotted in within web-based applications and from there it will judge if it's allowed access or not. This is common for http/https stuff so basically we're dealing with websites. It can determine if something is trying to input malicious data or whatnot like an sql injection so it'll block that. This firewall alongside a next gen one is used for critical stuff like Payment cards or healthcare. 
