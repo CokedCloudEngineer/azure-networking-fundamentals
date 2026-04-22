@@ -33,3 +33,29 @@ These ones are interesting because instead of comparing the port number it looks
 Web application firewall
 
 Now this is not like a normal firewall. It looks at the input being slotted in within web-based applications and from there it will judge if it's allowed access or not. This is common for http/https stuff so basically we're dealing with websites. It can determine if something is trying to input malicious data or whatnot like an sql injection so it'll block that. This firewall alongside a next gen one is used for critical stuff like Payment cards or healthcare. 
+
+
+Azure Relevant Information Section 
+
+
+Controlling Traffic Flows 
+
+I learned in my typing journey that i am in effect a very lazy person, but i still want to convey the right amount of information and context to myself and the one who is reading so i will be changing my writing style a bit.
+
+Now naturally within a network all the stuff in it by default in Azure can talk to each other, even separate subnets. But this is a security and compliance problem. If everything can talk to each other there's no protection let's say someone was able to compromise the resource or object they can do more damage. Also there are certain compliance standards companies must fulfill in terms of not only security but also privacy and how traffic is distributed instead of just one huge mess. so with that in mind i plan to introduce a few things that will definitely help you out. I'll just give you a quick rundown of each but we will tackle the dry Microsoft learn material later so we have plenty of time to learn the specifics.
+
+Azure Firewall
+
+This is the next gen firewall equivalent but within the cloud, if you're managing this massive cloud architecture and you have cash to burn this is your go to, it has different tiers to handle the kinds of workloads but generally all of them share the same tendency to be enterprise grade solutions. You dont necessarily have the luxury to nitpick every single rule and whatnot so this is a force multiplier of sort but of course it comes behind a pretty penny.
+
+Network Security Groups
+
+Now this baby is what you'll be handling most of the time, it has inbound and outbound rules just like your regular firewall but unlike azure firewall it lacks more upper layer oomph but it compensates by having two things: A high rule limit (5000) and being free. Now for the scale of my own capstone project, architecture wise it's enough to fulfill a decent level of security. It just takes a bit of elbow grease and logical mapping to get it right but if you do, you'd basically be done with security and you just need to make sure all the networks are functioning by pinging them but thats a different topic. Quick tip though, you can apply these at either the subnet or NIC level but preferably subnet, why? it makes things easier to manage since whatever rule you impose it's applied all the stuff within that subnet
+
+Service Tags
+
+Now remember the time i mentioned certain services needs their own dedicated subnets well this is your best friend when it comes to calibrating your nsgs around them, instead of trying to find address ranges by yourself you can just look up their respective service tags and azure will know which do you mean in regards to taking or giving data. Makes things easier and more efficient for you.
+
+Application Security Groups
+
+Now this isn't a different firewall but you can compare it to a service tag but for your own specific stuff that isn't generally a considered cluster of a main service, so if you have a fleet of VMs you can assign this kind of tag on them so Azure will know which devices you mean but bear in mind if you configure your rules these apply at the nic level and not the subnet so pay attention that your stuff doesn't overlap
