@@ -11,7 +11,7 @@
 ## Topics Covered
 - [x] 01 - IP Addressing and Subnetting
 - [x] 02 - VNets and Subnets
-- [ ] 03 - Network Security Groups (NSGs)
+- [x] 03 - Network Security Groups (NSGs)
 - [ ] 04 - VNet Peering
 - [ ] 05 - Azure DNS
 - [ ] 06 - Load Balancing (Azure Load Balancer + Application Gateway)
