@@ -1,143 +1,188 @@
-Access Control Lists (ACL)
+# Networking Prerequisites: ACLs, Firewalls, and Network Security Groups
 
-Now, for our third topic we are going to tackle what NSGs are but for the sake of having a better understanding of what they are in Azure we have to consult upon a few topics beforehand, first of which is this ACL thing that i will explain below...
+> This section covers the concepts behind traffic filtering and network security before diving into how Azure implements these ideas through Network Security Groups. Understanding ACLs and firewalls first makes NSGs feel like a natural conclusion rather than a foreign concept dropped on you from nowhere.
 
-An access control list is for our building think of the list of people and the objects they carry to go in and out. But specifically its a packet filter, and a way to let traffic in or keep it out. This can be used alongside NAT where you should be able to figure out what kind of id card(ip address) needs to be changed from private to public so that it can communicate to the outside world, its how your azure services well at least the front facing ones, the ones where it has to talk to the internet, its private ip is translated to the public one it has to use and the ACL has to have that private ip so it knows that said ip is part of the ips that need to be translated. 
+---
 
-These things are typically applied on a router to watch at traffic going and coming, while some ACLs can be very specific, like just looking at either the source ip, destination ip and etc. Back to our analogy, every allowable list in your building has different rule provisions depending how your list was written. hoever its not that so simple that oh since its part of our list its supposed to go through, it doesn't work that way. what happens is that it will consider to either let a qualified id card through or not which depends on its rules.
+## Table of Contents
 
-A rule base in a firewall? that can be considered an access control list because it has a list of certain ips allowed to qualify for rule comparison or just outright denied at all. This combination of rules is called a tuple, now for efficient and secure traffic flow, some people would combine multiple tuples to make a very specific access control rule. 
+Use `Ctrl+F` to jump to any section.
 
-How does these rules work though? It starts from top to bottom if the stuff it gets doesn't match the one at the top, it moves down and down until it's either found a match or no match so thats where implicit deny comes in. Since it didn't follow any rule at all why would we let this object be considered to be let into our building, we're not going to allow this id card. These rules can be very general or specific but usually the more specific ones go at the top. 
+- [Access Control Lists](#access-control-lists)
+  - [How ACL Rules Work](#how-acl-rules-work)
+  - [Tuples and Rule Combinations](#tuples-and-rule-combinations)
+- [Firewall Types](#firewall-types)
+  - [What a Firewall Actually Does](#what-a-firewall-actually-does)
+  - [Network Based Firewalls](#network-based-firewalls)
+  - [UTM and All-in-One Security Appliances](#utm-and-all-in-one-security-appliances)
+  - [Next Generation Firewalls](#next-generation-firewalls)
+  - [Web Application Firewalls](#web-application-firewalls)
+- [Azure Relevant Information: Controlling Traffic Flows](#azure-relevant-information-controlling-traffic-flows)
+  - [Azure Firewall](#azure-firewall)
+  - [Network Security Groups](#network-security-groups)
+  - [Service Tags](#service-tags)
+  - [Application Security Groups](#application-security-groups)
+- [Microsoft Learn Section: Implement Security Groups](#microsoft-learn-section-implement-security-groups)
+  - [Determine Network Security Group Rules](#determine-network-security-group-rules)
+  - [Determine Network Security Group Effective Rules](#determine-network-security-group-effective-rules)
+  - [Augmented Security Rules](#augmented-security-rules)
+  - [Implement Application Security Groups](#implement-application-security-groups)
 
-Firewall Types
+---
 
-Now i was thinking whether or not to fully include all the nitty gritty details on this but i decided not to, however i will still mention the types of firewalls, what they do and where do they work. At the very least this alongside the previous and next section will provide you a more appreciative understanding of the stuff we will do when it comes to network security groups
+## Access Control Lists
 
-But generally, if you're connected to the internet( which is most likely since you're reading this from GitHub) you are most definitely using a firewall. A firewall in the most bare bones of the definition is something that controls the flow of network traffic. It can also be used to monitor and control incoming and outgoing corporate data for security and compliance reasons. It's also used to secure the user from accessing sus or otherwise not allowed content or sites and of course last but not the least it is used to protect against malware, attacks and viruses.
+For our third topic we are going to tackle what NSGs are but for the sake of having a better understanding of what they are in Azure we have to consult upon a few topics beforehand, first of which is the ACL.
 
-Network-based firewalls
+An access control list is for our building like the list of people and the objects they carry to go in and out. But specifically it is a packet filter, a way to let traffic in or keep it out. This can be used alongside NAT where you should be able to figure out what kind of ID card or IP address needs to be changed from private to public so that it can communicate to the outside world. Its how your Azure services, at least the front facing ones that have to talk to the internet, get their private IP translated to the public one they have to use. The ACL has to have that private IP so it knows that said IP is part of the addresses that need to be translated.
 
-these are the traditional ones, think of it as the old guard in the building where we're at, old but generally somewhat reliable in some cases, these kinds of firewalls will look at the UDP port number and a port is like the endpoint of a software or a service like a service endpoint in azure where you'll be connecting various of these to make sure your services can talk to each other.
+These things are typically applied on a router to watch traffic going and coming. Some ACLs can be very specific, like just looking at either the source IP, destination IP and etc. Back to our analogy, every allowable list in your building has different rule provisions depending on how your list was written. However its not as simple as oh since its part of our list it is supposed to go through. It does not work that way. What happens is that it will consider whether to let a qualified ID card through or not depending on its rules.
 
-Oh I forgot to mention they can also integrate other services like VPN so your security environment will be even more tightly locked down. They can also work as a network device of sorts and they're placed at the edge of the network so they control the flow of data within the network and its outward vicinity. it's like properly placing checkpoints near the entry points of your building so ne'er do wells have a harder time getting in and causing damage. 
+### Tuples and Rule Combinations
 
-UTM / AIO security appliance
+A rule base in a firewall can be considered an access control list because it has a list of certain IPs allowed to qualify for rule comparison or just outright denied entirely. This combination of rules is called a tuple. For efficient and secure traffic flow, some people would combine multiple tuples to make a very specific access control rule.
 
-All you need to know is within it's name, its literally an all in one for protecting your network like inspecting malware, preventing spam, url filter so you can make sure no one's accessing sites they're not supposed to see and a bunch if other functions. Given their multifunctionality they can work at a variety of layers, however you can't run all at the same time because it would severely limit the performance
+### How ACL Rules Work
 
-Next Generation firewalls
+It starts from top to bottom. If the traffic it receives does not match the rule at the top it moves down and down until it has either found a match or no match. That is where implicit deny comes in. Since it did not follow any rule at all, why would we let this object be considered for entry into our building? We are not going to allow this ID card. These rules can be very general or very specific but usually the more specific ones go at the top.
 
-These ones are interesting because instead of comparing the port number it looks at all the data in every packet. What does that mean? it can recognize whos sending the traffic, where its being sent, whats in the application layer and with all of that it can then make forwarding decisions depending on those. Next gen is basically able to scan all of this traffic, figure out what kind of application is being used and then and then make said decisions. It's also common for a next gen firewall to have a sort of list of known vulnerabilities, that it can allow or block inside the firewall. The cool part is that its content filtering measures would allow you to not just rely on the urls to block websites but on what kind of websites they might ought to be. 
+---
 
-Web application firewall
+## Firewall Types
 
-Now this is not like a normal firewall. It looks at the input being slotted in within web-based applications and from there it will judge if it's allowed access or not. This is common for http/https stuff so basically we're dealing with websites. It can determine if something is trying to input malicious data or whatnot like an sql injection so it'll block that. This firewall alongside a next gen one is used for critical stuff like Payment cards or healthcare. 
+Now I was thinking whether or not to fully include all the nitty gritty details on this but I decided not to. However I will still mention the types of firewalls, what they do and where they work. At the very least this alongside the previous and next section will provide you a more appreciative understanding of the stuff we will do when it comes to network security groups.
 
+### What a Firewall Actually Does
 
-Azure Relevant Information Section 
+If you are connected to the internet, which is most likely since you are reading this from GitHub, you are most definitely using a firewall. A firewall in the most bare bones definition is something that controls the flow of network traffic. It can also be used to monitor and control incoming and outgoing corporate data for security and compliance reasons. It is also used to secure the user from accessing suspicious or otherwise not allowed content or sites and of course last but not least it is used to protect against malware, attacks and viruses.
 
+### Network Based Firewalls
 
-Controlling Traffic Flows 
+These are the traditional ones. Think of it as the old guard in the building where we are at, old but generally somewhat reliable. These kinds of firewalls will look at the port number. A port is like the endpoint of a software or a service, like a service endpoint in Azure where you will be connecting various of these to make sure your services can talk to each other.
 
-I learned in my typing journey that i am in effect a very lazy person, but i still want to convey the right amount of information and context to myself and the one who is reading so i will be changing my writing style a bit.
+They can also integrate other services like VPN so your security environment will be even more tightly locked down. They can also work as a network device of sorts and they are placed at the edge of the network so they control the flow of data within the network and its outward vicinity. It is like properly placing checkpoints near the entry points of your building so bad actors have a harder time getting in and causing damage.
 
-Now naturally within a network all the stuff in it by default in Azure can talk to each other, even separate subnets. But this is a security and compliance problem. If everything can talk to each other there's no protection let's say someone was able to compromise the resource or object they can do more damage. Also there are certain compliance standards companies must fulfill in terms of not only security but also privacy and how traffic is distributed instead of just one huge mess. so with that in mind i plan to introduce a few things that will definitely help you out. I'll just give you a quick rundown of each but we will tackle the dry Microsoft learn material later so we have plenty of time to learn the specifics.
+### UTM and All-in-One Security Appliances
 
-Azure Firewall
+All you need to know is within the name. It is literally an all in one for protecting your network, covering things like inspecting malware, preventing spam, URL filtering so you can make sure no one is accessing sites they are not supposed to see and a bunch of other functions. Given their multifunctionality they can work at a variety of layers. However you cannot run all functions at the same time because the more features you enable the more processing power it consumes, so there is always a tradeoff between features and throughput. Running everything simultaneously would severely limit performance.
 
-This is the next gen firewall equivalent but within the cloud, if you're managing this massive cloud architecture and you have cash to burn this is your go to, it has different tiers to handle the kinds of workloads but generally all of them share the same tendency to be enterprise grade solutions. You dont necessarily have the luxury to nitpick every single rule and whatnot so this is a force multiplier of sort but of course it comes behind a pretty penny.
+### Next Generation Firewalls
 
-Network Security Groups
+These ones are interesting because instead of just comparing the port number it looks at all the data in every packet. What does that mean? It can recognize who is sending the traffic, where it is being sent, what is in the application layer and with all of that it can then make forwarding decisions depending on those factors. Next gen is basically able to scan all of this traffic, figure out what kind of application is being used and then make said decisions.
 
-Now this baby is what you'll be handling most of the time, it has inbound and outbound rules just like your regular firewall but unlike azure firewall it lacks more upper layer oomph but it compensates by having two things: A high rule limit (5000) and being free. Now for the scale of my own capstone project, architecture wise it's enough to fulfill a decent level of security. It just takes a bit of elbow grease and logical mapping to get it right but if you do, you'd basically be done with security and you just need to make sure all the networks are functioning by pinging them but thats a different topic. Quick tip though, you can apply these at either the subnet or NIC level but preferably subnet, why? it makes things easier to manage since whatever rule you impose it's applied all the stuff within that subnet
+It is also common for a next gen firewall to have a sort of list of known vulnerabilities that it can allow or block inside the firewall. The cool part is that its content filtering measures would allow you to not just rely on the URLs to block websites but on what kind of websites they might actually be.
 
-Service Tags
+### Web Application Firewalls
 
-Now remember the time i mentioned certain services needs their own dedicated subnets well this is your best friend when it comes to calibrating your nsgs around them, instead of trying to find address ranges by yourself you can just look up their respective service tags and azure will know which do you mean in regards to taking or giving data. Makes things easier and more efficient for you.
+Now this is not like a normal firewall. It looks at the input being slotted into web-based applications and from there it will judge if it is allowed access or not. This is common for HTTP and HTTPS stuff so basically we are dealing with websites. It can determine if something is trying to input malicious data like an SQL injection and block that. This firewall alongside a next gen one is used for critical stuff like payment cards or healthcare.
 
-Application Security Groups
+---
 
-Now this isn't a different firewall but you can compare it to a service tag but for your own specific stuff that isn't generally a considered cluster of a main service, so if you have a fleet of VMs you can assign this kind of tag on them so Azure will know which devices you mean but bear in mind if you configure your rules these apply at the nic level and not the subnet so pay attention that your stuff doesn't overlap
+## Azure Relevant Information: Controlling Traffic Flows
 
+Now naturally within a network all the stuff in it by default in Azure can talk to each other, even separate subnets. But this is a security and compliance problem. If everything can talk to each other there is no protection. If someone was able to compromise a resource or object they can do more damage. Also there are certain compliance standards companies must fulfill in terms of not only security but also privacy and how traffic is distributed instead of just one huge mess. So with that in mind here is a quick rundown of a few things that will definitely help you out. We will tackle the Microsoft Learn material later so we have plenty of time to learn the specifics.
 
-Microsoft Learn Section
+### Azure Firewall
 
-Implement security groups
+This is the next gen firewall equivalent but within the cloud. If you are managing a massive cloud architecture and you have cash to burn this is your go to. It has different tiers to handle the kinds of workloads but generally all of them share the same tendency to be enterprise grade solutions. You do not necessarily have the luxury to nitpick every single rule and whatnot so this is a force multiplier of sorts but of course it comes at a pretty penny.
 
-Now i want to add that aside from the stuff that i mentioned above the NSGs don't apply 1 to 1 to a subnet , they can be used to associate more than one subnet but each subnet can only be associated with one NSG. This is convenient for the reason that all of the rules you might have is going to be managed from one interface so the bulk of the work is at least more or less converged there. Although you do need to logically map everything correctly. Because if you look at it one way why would you carelessly put your checkpoints all throughout your building with considering how would your data move inside? so you have to consider how would you want people move inside your building .
+### Network Security Groups
 
-Determine Network Security Group Rules
+Now this is what you will be handling most of the time. It has inbound and outbound rules just like your regular firewall but unlike Azure Firewall it lacks more upper layer capability. It compensates by having two things: a high rule limit of 5000 and being free.
 
-Since these things help you to filter traffic, the rules inside help a lot in making sure that traffic is only supposed to flow the way it is. But necessarily there are default rules in Azure, these rules have priority number of 65000. pretty big right? Well here logically 
-the bigger the number the lower the priority which means they're goint to be enforced later than lets say a rule at 2k. What you need to know is that these said rules can go from a priority number of 100 to 4096. Plenty of rules to come by. All of which are customizable thanks to chart below:
+For the scale of a personal capstone project, architecture wise it is enough to fulfill a decent level of security. It just takes a bit of elbow grease and logical mapping to get it right but if you do you would basically be done with security and you just need to make sure all the networks are functioning by pinging them, but that is a different topic.
 
-Setting			Value
-Source			Any, IP Addresses, My IP address, Service Tag, or Application security group
-Source port ranges	Specify the ports on which the rule allows or denies traffic
-Destination		Any, IP Addresses, Service Tag, or Application security group
-Protocol		Restrict the rule to Transmission Control Protocol (TCP), User Datagram Protocol (UDP), Internet Control Message 			Protocol (ICMP), Encapsulating Security Payload (ESP), or Authentication Header (AH). ESP and AH protocols are 				only available via JSON templates and PowerShell. The default is for the rule to apply to all protocols (Any).
-Action			Allow or Deny
-Priority		A value between 100 and 4,096 that's unique for all security rules within the NSG
+Quick tip: you can apply these at either the subnet or NIC level but preferably subnet. Why? It makes things easier to manage since whatever rule you impose is applied to all the stuff within that subnet.
 
-Also those default rules i mentioned are impossible to delete so it's better off if you do override it by putting a higher priority number instead. 
+### Service Tags
 
-Determine Network Security Group Effective Rules
+Remember when I mentioned that certain services need their own dedicated subnets? Service tags are your best friend when it comes to calibrating your NSGs around them. Instead of trying to find address ranges by yourself you can just look up their respective service tags and Azure will know which service you mean in regards to taking or giving data. Makes things easier and more efficient for you.
 
-There's a reason why it's recommended that you usually enforce your NSGs at the subnet level, like a standard operating procedure on how you should manage the checkpoints in your building. It allows you to manage things easier because if you set NSGs at the nic level now you have to consider addtitonal things like:
+### Application Security Groups
 
-For inbound traffic, Azure first processes network security group security rules for any associated subnets and then any associated network interfaces.
+Now this is not a different firewall but you can compare it to a service tag but for your own specific stuff that is not generally a considered cluster of a main service. So if you have a fleet of VMs you can assign this kind of tag on them so Azure will know which devices you mean. But bear in mind if you configure your rules these apply at the NIC level and not the subnet level so pay attention that your stuff does not overlap.
 
-For outbound traffic, the process is reversed. Azure first evaluates network security group security rules for any associated network interfaces followed by any associated subnets.
+---
 
-For both the inbound and outbound evaluation process, Azure also checks how to apply the rules for intra-subnet traffic. Intra-subnet traffic refers to virtual machines in the same subnet.
+## Microsoft Learn Section: Implement Security Groups
 
-Now you might have a genuine reason why you want to put something at the NIC level to either redirect your traffic more specifically or a sort or pseudo quarantine where you still need to access the network but you can't let something compromised interact with the okay parts of your subnet. But generally you'll be fine with using an nsg at the subnet level.
+Now I want to add that aside from the stuff mentioned above, NSGs do not apply one to one to a subnet. They can be used to associate more than one subnet but each subnet can only be associated with one NSG. This is convenient for the reason that all of the rules you might have are going to be managed from one interface so the bulk of the work is at least more or less converged there. Although you do need to logically map everything correctly. Because if you look at it one way, why would you carelessly put your checkpoints all throughout your building without considering how your data moves inside? You have to consider how you want people to move inside your building.
 
-Now i will just plop something from Microsoft Learn here that explains more stuff in detail
+### Determine Network Security Group Rules
 
-Consider allowing all traffic. If you place your virtual machine within a subnet or utilize a network interface, you don't have to associate the subnet or NIC with a network security group. This approach allows all network traffic through the subnet or NIC according to the default Azure security rules. If you're not concerned about controlling traffic to your resource at a specific level, then don't associate your resource at that level to a network security group.
+Since these things help you filter traffic, the rules inside help a lot in making sure that traffic only flows the way it is supposed to. There are default rules in Azure and these rules have a priority number of 65000. Pretty big right? Well here logically the bigger the number the lower the priority, which means they are going to be enforced later than a rule sitting at say 2000. What you need to know is that custom rules can go from a priority number of 100 to 4096. Plenty of rules to come by. All of which are customizable as shown in the chart below:
 
-Consider importance of allow rules. When you create a network security group, you must define an allow rule for both the subnet and network interface in the group to ensure traffic can get through. If you have a subnet or NIC in your network security group, you must define an allow rule at each level. Otherwise, the traffic is denied for any level that doesn't provide an allow rule definition.
+```
+Setting              Value
+Source               Any, IP Addresses, My IP address, Service Tag, or Application Security Group
+Source port ranges   Specify the ports on which the rule allows or denies traffic
+Destination          Any, IP Addresses, Service Tag, or Application Security Group
+Protocol             TCP, UDP, ICMP, ESP, AH, or Any
+                     Note: ESP and AH are only available via JSON templates and PowerShell
+Action               Allow or Deny
+Priority             A value between 100 and 4096, unique for all security rules within the NSG
+```
 
-Consider intra-subnet traffic. The security rules for a network security group associated to a subnet can affect traffic between all virtual machines in the subnet. You can prohibit intra-subnet traffic by defining a rule in the network security group to deny all inbound and outbound traffic. This rule prevents all virtual machines in your subnet from communicating with each other.
+Also those default rules are impossible to delete so it is better to override them by putting a higher priority rule above them instead.
 
-Consider rule priority. The security rules for a network security group are processed in priority order. To ensure a particular security rule is always processed, assign the lowest possible priority value to the rule. It's a good practice to leave gaps in your priority numbering, such as 100, 200, 300, and so. The gaps in the numbering allow you to add new rules without having to edit existing rules.
+### Determine Network Security Group Effective Rules
 
-But of course it always helps to actually know what's going on so you can either check out the effective security rules section of you r NSG or the azure network watcher. 
+There is a reason why it is recommended that you usually enforce your NSGs at the subnet level, like a standard operating procedure on how you should manage the checkpoints in your building. It allows you to manage things easier because if you set NSGs at the NIC level now you have to consider additional things like:
 
-There are times where you do need to augment further your security rules and remember how when configuring your firewall you're supposed to make sure the specific ones are at the top? you can apply the same logic here 
+For inbound traffic, Azure first processes network security group rules for any associated subnets and then any associated network interfaces.
 
-A single network security group rule can contain multiple values in the Source, Destination, and Service fields. This approach, called augmented security rules, reduces the total number of rules needed and simplifies NSG management.
+For outbound traffic, the process is reversed. Azure first evaluates network security group rules for any associated network interfaces followed by any associated subnets.
 
-Things to know about augments security rules
+For both the inbound and outbound evaluation process, Azure also checks how to apply the rules for intra-subnet traffic, which refers to virtual machines communicating within the same subnet.
 
-Multiple IP addresses: Combine multiple IP addresses into one rule.
+Now you might have a genuine reason why you want to put something at the NIC level, either to redirect your traffic more specifically or as a sort of pseudo quarantine where you still need to access the network but you cannot let something compromised interact with the healthy parts of your subnet. But generally you will be fine using an NSG at the subnet level.
 
-Multiple port ranges: Specify multiple ports and ranges in the Service field.
+Here are some key considerations from Microsoft Learn worth keeping in mind:
 
-Service tags and ASGs: Mix service tags, application security groups, and IP addresses within the same rule.
+**Consider allowing all traffic.** If you place your virtual machine within a subnet or utilize a network interface, you do not have to associate the subnet or NIC with a network security group. This approach allows all network traffic through the subnet or NIC according to the default Azure security rules. If you are not concerned about controlling traffic to your resource at a specific level then do not associate your resource at that level to a network security group.
 
-Reduced rule count: Instead of creating separate rules for each IP range or port, combine them into fewer, more manageable rules.
+**Consider the importance of allow rules.** When you create a network security group, you must define an allow rule for both the subnet and network interface in the group to ensure traffic can get through. If you have a subnet or NIC in your network security group, you must define an allow rule at each level. Otherwise the traffic is denied for any level that does not provide an allow rule definition.
 
-In enterprise environments with many IP ranges or services, augmented rules prevent NSG rule sprawl. For example, instead of creating four separate rules for ports 80, 443, 8080, and 8090, create one rule with all the ports.
+**Consider intra-subnet traffic.** The security rules for a network security group associated to a subnet can affect traffic between all virtual machines in the subnet. You can prohibit intra-subnet traffic by defining a rule in the network security group to deny all inbound and outbound traffic. This rule prevents all virtual machines in your subnet from communicating with each other.
 
-Implement application security groups
+**Consider rule priority.** The security rules for a network security group are processed in priority order. To ensure a particular security rule is always processed, assign the lowest possible priority value to the rule. It is good practice to leave gaps in your priority numbering such as 100, 200, 300 and so on. The gaps in the numbering allow you to add new rules without having to edit existing rules.
 
-Application security groups help you structure and select your stuff more accurately. As i said before, instead of picking ip ranges you can just choose these tags instead so you have an easier time making up rules for them in your network security group.
+It always helps to actually know what is going on so you can either check out the effective security rules section of your NSG or use Azure Network Watcher.
 
-Again i barely have any feedback here but this is another excerpt from Microsoft learn:
+### Augmented Security Rules
 
-There are several advantages to implementing application security groups in your virtual networks.
+There are times where you do need to augment further your security rules and remember how when configuring your firewall you are supposed to make sure the specific rules are at the top? You can apply the same logic here.
 
-Consider IP address maintenance. When you control network traffic by using application security groups, you don't need to configure inbound and outbound traffic for specific IP addresses. If you have many virtual machines in your configuration, it can be difficult to specify all of the affected IP addresses. As you maintain your configuration, the number of your servers can change. These changes can require you to modify how you support different IP addresses in your security rules.
+A single network security group rule can contain multiple values in the Source, Destination and Service fields. This approach called augmented security rules reduces the total number of rules needed and simplifies NSG management.
 
-Consider no subnets. By organizing your virtual machines into application security groups, you don't need to also distribute your servers across specific subnets. You can arrange your servers by application and purpose to achieve logical groupings.
+Here is what you need to know about augmented security rules:
 
-Consider simplified rules. Application security groups help to eliminate the need for multiple rule sets. You don't need to create a separate rule for each virtual machine. You can dynamically apply new rules to designated application security groups. New security rules are automatically applied to all the virtual machines in the specified application security group.
+**Multiple IP addresses** — Combine multiple IP addresses into one rule.
 
-Consider workload support. A configuration that implements application security groups is easy to maintain and understand because the organization is based on workload usage. Application security groups provide logical arrangements for your applications, services, data storage, and workloads.
+**Multiple port ranges** — Specify multiple ports and ranges in the Service field.
 
-Consider service tags. Service Tags represent a group of IP address prefixes from a specific Azure service. They help minimize the complexity of frequent updates on network security rules. While service tags are used to simplify the management of IP addresses for Azure services, ASGs are used to group VMs and manage network security policies based on those groups.
+**Service tags and ASGs** — Mix service tags, application security groups and IP addresses within the same rule.
 
+**Reduced rule count** — Instead of creating separate rules for each IP range or port, combine them into fewer more manageable rules.
 
+In enterprise environments with many IP ranges or services, augmented rules prevent NSG rule sprawl. For example instead of creating four separate rules for ports 80, 443, 8080 and 8090, create one rule with all the ports.
+
+### Implement Application Security Groups
+
+Application security groups help you structure and select your stuff more accurately. As mentioned before, instead of picking IP ranges you can just choose these tags instead so you have an easier time making up rules for them in your network security group.
+
+Here are the advantages to implementing application security groups in your virtual networks:
+
+**Consider IP address maintenance.** When you control network traffic by using application security groups, you do not need to configure inbound and outbound traffic for specific IP addresses. If you have many virtual machines in your configuration it can be difficult to specify all of the affected IP addresses. As you maintain your configuration the number of your servers can change and these changes can require you to modify how you support different IP addresses in your security rules.
+
+**Consider no subnets.** By organizing your virtual machines into application security groups, you do not need to also distribute your servers across specific subnets. You can arrange your servers by application and purpose to achieve logical groupings.
+
+**Consider simplified rules.** Application security groups help to eliminate the need for multiple rule sets. You do not need to create a separate rule for each virtual machine. You can dynamically apply new rules to designated application security groups. New security rules are automatically applied to all the virtual machines in the specified application security group.
+
+**Consider workload support.** A configuration that implements application security groups is easy to maintain and understand because the organization is based on workload usage. Application security groups provide logical arrangements for your applications, services, data storage and workloads.
+
+**Consider service tags.** Service tags represent a group of IP address prefixes from a specific Azure service. They help minimize the complexity of frequent updates on network security rules. While service tags are used to simplify the management of IP addresses for Azure services, ASGs are used to group VMs and manage network security policies based on those groups.
+
+---
+
+*This guide is a living document. More sections will be added as the AZ-104 study journey continues.*
