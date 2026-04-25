@@ -1,1 +1,27 @@
+VNet Peering
+
+Today im in a sort of a hollow mood since im as of the time of this writing currently fasting and im breaking it in a few hours, so if the writing quality sucks then im sorry. As per usual we're going to start this topic with a messer foundational knowledge primer or something before we tackle onto the azure stuff. Without further ado, this si the first sub-topic.
+
+Routing Technologies
+
+Building a Routing Table
+
+I've been doing even more amounts of thinking, and i was deliberating on how can i make sure that what im telling you is just as beginner friendly however i still need to be even more efficient because explaining to you in metaphors is good and i will keep continuing so, but for sections like these or stuff that isn't extremely hands-on in a sense that not everything can be substituted to an analogy. With that in mind, at least for this section i can still write to you normally. 
+
+Now i want to go over the fact that routing as a concept is going to be very critical once we do our azure stuff in relation to how we would navigate traffic. We need to understand what is a router first, now take for example you have a building right? now you might have your rooms and pipes and whatnot even the checkpoints. That's all fine and dandy however, we need to at least not only restrict traffic to appropriate sensibilities but to direct it as well. So a router does exactly that, think of it as within your building a helpful guide to show you the best route for a specific room you want to go. How does said router achieve that function?
+
+Now if you had a map to the building and by this point you need to go to a specific room, you check your map and it has two separate routes. One is on the right floor but it does not give you the right room or at the very least which place it is. The other route gives you way more details. So you would choose the more specific route right?
+For example, say you are trying to reach 192.168.10.25. Your routing table has two entries that could match: one entry for 192.168.0.0/16 which covers a broad range of rooms on the right floor, and another for 192.168.10.0/24 which points directly to the correct corridor. The router picks the /24 entry because it is more specific, meaning it has more network bits and therefore narrows down the destination more precisely. This is called the longest prefix match and it is the core logic behind how every routing decision gets made.
+Here is what a small routing table actually looks like:
+Destination         Subnet Mask         Next Hop            AD      Metric
+192.168.10.0        /24                 192.168.1.1         1       0
+192.168.0.0         /16                 192.168.1.2         1       10
+10.0.0.0            /8                  10.0.0.1            90      20
+0.0.0.0             /0                  192.168.1.1         1       5
+The router reads this top to bottom and picks the most specific match for wherever the traffic needs to go. But what happens when two routes are equally specific and point to the same destination through different paths? That is where the two clinchers come in.
+The first clincher is Administrative Distance or AD. This is a trust score assigned to the source of the routing information. The lower the AD the more the router trusts that route. A directly connected route has an AD of 0 because the router knows for certain that network is right there. A statically configured route has an AD of 1. Routes learned through routing protocols like OSPF or EIGRP have higher AD values because they are learned secondhand rather than known directly. So if two routes point to the same destination the router picks the one with the lower AD first.
+The second clincher is Metric. If two routes have the same destination and the same AD, the router then looks at the metric which is essentially a cost measurement. Think of it like your building guide saying both routes get you to the same room with the same level of trustworthiness but one route has fewer stairs. The router picks the lower metric because it represents the less costly path.
+So the full decision order is: most specific route first, then lowest AD, then lowest metric. If all three are tied the router can load balance across both routes but that is a different topic.
+
+
 
