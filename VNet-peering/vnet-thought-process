@@ -23,5 +23,7 @@ The first clincher is Administrative Distance or AD. This is a trust score assig
 The second clincher is Metric. If two routes have the same destination and the same AD, the router then looks at the metric which is essentially a cost measurement. Think of it like your building guide saying both routes get you to the same room with the same level of trustworthiness but one route has fewer stairs. The router picks the lower metric because it represents the less costly path.
 So the full decision order is: most specific route first, then lowest AD, then lowest metric. If all three are tied the router can load balance across both routes but that is a different topic.
 
+Azure Relevant Information section
+
 
 
