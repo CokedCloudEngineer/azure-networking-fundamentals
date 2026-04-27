@@ -23,7 +23,70 @@ The first clincher is Administrative Distance or AD. This is a trust score assig
 The second clincher is Metric. If two routes have the same destination and the same AD, the router then looks at the metric which is essentially a cost measurement. Think of it like your building guide saying both routes get you to the same room with the same level of trustworthiness but one route has fewer stairs. The router picks the lower metric because it represents the less costly path.
 So the full decision order is: most specific route first, then lowest AD, then lowest metric. If all three are tied the router can load balance across both routes but that is a different topic.
 
-Azure Relevant Information section
+
+Azure Relevant Information Section
+
+Connecting Virtual Networks
+
+Now in your professional workloads, you will encounter multiple accounts and subscriptions. Why is this relevant? because on one company lets say chances are that's their exact network structure for the company. It's not a one stop shop for all of the company's needs. So you will most definitely encounter multiple virtual networks in different subscriptions. Now traditionally you could do two things network wise for very high level stuff it's either do site to site vpns or expressroute all the way. Both are absolutely terrible for what you want to do for completely different reasons. site to site throttles your bandwidth because the traffic has to go through a tunnel and therefore consume additional computing power. EXPRESSROUTE is well, if your vnets are just in the same region or even in the same data center and you want them to be able to talk to each other and you route them like that? you're basically taking the long long way to transmit the same data which means ungodly amounts of latency. Think about it this way, if you wanted to send a cake to your friend for his birthday would you rather either send it through fedex which is stupid and takes ages when he's just your neighbor or would you wait for other neighbors to visit his house to wait and ask them to help you send a cake bit by bit? hell no! there's a better way to give him the cake and that's by visiting his house directly and that's what we're going to transition to Peering
+
+Peering
+
+Virtual Network Peering is establishing a relationship between two virtual networks, but of course as a cynic would say almost all are transactional but in this case it is true since you're paying for data you ingress or egress per gb. When you're establishing these peering relationships between vnets, absolutely don't let the address species for these overlap like at all. Otherwise, the peering won't work. There is a way for certain ranges to overlap and that's where the grandkids method comes into play. so if you have a parent vnet and two kid vnets those kid vnets can peer to the same grandkid vnet. Further more, if you have vnet 1,2 and 3 you peer them as vnet 1, then vnet 2 and then to vnet 3 in a sequence. Vnet 1 cannot talk to vnet 3 since the peering relationship is not transitive.
+
+There's also subnet-level peering which is a very handy thing, you just need on the interface to set a setting called peer complete vnet to false and then you choose which subnets through their names you want to connect. Because god forbid there are some vnets whose ip address spaces do overlap, however you can just peer their respective subnets that dont overlap instead.
+
+Microsoft learn Section
+ 
+For the most part to spare you from the dryness what im going to do instead is to just convey the necessary information that you can. Without further ado, I've already mentioned a potential use case for vnet peering. But i want to add the distinction of you can either try regional or global peering. And they could be within or between subscriptions:
+
+Benefit	Description
+Private network connections	When you implement Azure Virtual Network peering, network traffic between peered virtual networks is private. Traffic between the virtual networks is kept on the Microsoft Azure backbone network. No public internet, gateways, or encryption is required in the communication between the virtual networks.
+Strong performance	Because Azure Virtual Network peering utilizes the Azure infrastructure, you gain a low-latency, high-bandwidth connection between resources in different virtual networks.
+Simplified communication	Azure Virtual Network peering lets resources in one virtual network communicate with resources in a different virtual network, after the virtual networks are peered.
+Seamless data transfer	You can create an Azure Virtual Network peering configuration to transfer data across Azure subscriptions, deployment models, and across Azure regions.
+No resource disruptions	Azure Virtual Network peering doesn't require downtime for resources in either virtual network when creating the peering, or after the peering is created.
+
+Also this one 
+
+Things to know about peering requirements and limitations
+While VNet peering provides many benefits, there are important constraints to understand.
+
+Requirements/Limitations	Description
+Nonoverlapping address spaces	Peered virtual networks must have non-overlapping IP address spaces. Peering creation fails if address ranges overlap.
+Address space modification restrictions	If you want to change a VNet's address range, you need to delete the peering first, update the address space, and then set up the peering again.
+Basic Load Balancer limitations	Resources in one VNet can’t communicate with Basic Internal Load Balancer IPs in VNets peered across regions. Use the Standard Load Balancer for cross-region connections.
+DNS resolution boundaries	Azure's built-in name resolution does not work across peered VNets. Configure Azure Private DNS zones or custom DNS servers for cross-VNet name resolution.
 
 
+Determine gateway transit and connectivity
 
+The only thing i want to add here is if you have a hub and spoke network topology, you have a hub where your core services lie and a spoke with other vnets. Now for blast radius reduction while needing to connect your on prem facilities you use a vpn gateway but here are some things to bear in ind;
+
+Things to know about Azure VPN Gateway
+Let's take a closer look at how Azure VPN Gateway is implemented with Azure Virtual Network peering.
+
+A virtual network can have only one VPN gateway.
+
+Gateway transit is supported for both regional and global virtual network peering.
+
+When you allow VPN gateway transit, the virtual network can communicate to resources outside the peering. In our sample illustration, the gateway subnet gateway within the hub virtual network can complete tasks such as:
+
+Use a site-to-site VPN to connect to an on-premises network.
+Use a vnet-to-vnet connection to another virtual network.
+Use a point-to-site VPN to connect to a client.
+Gateway transit allows peered virtual networks to share the gateway and get access to external resources. With this implementation, you don't need to deploy a VPN gateway in the peered virtual network.
+
+You can apply network security groups in a virtual network to block or allow access to other virtual networks or subnets. When you configure virtual network peering, you can choose to open or close the network security group rules between the virtual networks.
+
+Create Virtual Network peering
+
+I'm going to spoil it to you, its easy to peer networks with a click of the azure Portal. Even if this is global, however. There are a fw key reminders you need to remember when peering said networks. 
+
+To implement virtual network peering, your Azure account must be assigned to the Network Contributor role. Alternatively, your Azure account can be assigned to a custom role that can complete the necessary peering actions. For details, see Permissions.
+
+To create a peering, you need two virtual networks.
+
+The second virtual network in the peering is referred to as the remote network.
+
+Initially, the virtual machines in your virtual networks can't communicate with each other. After the peering is established, the machines can communicate within the peered network based on your configuration settings.
