@@ -12,7 +12,7 @@
 - [x] 01 - IP Addressing and Subnetting
 - [x] 02 - VNets and Subnets
 - [x] 03 - Network Security Groups (NSGs)
-- [ ] 04 - VNet Peering
+- [x] 04 - VNet Peering
 - [ ] 05 - Azure DNS
 - [ ] 06 - Load Balancing (Azure Load Balancer + Application Gateway)
 - [ ] 07 - VPN Gateway
